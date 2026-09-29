@@ -50,17 +50,18 @@ class QwenImage21Sampler(BaseModelSampler):
                 # QwenImage21Pipeline otherwise normalizes condition images to its default 1024x1024 area.
                 # Matching that area to the requested output makes its own pre-encode resize retain width/height.
                 pipeline_kwargs["output_resolution"] = round(math.sqrt(width * height))
-        output = self.pipeline(
-            prompt=sample_config.prompt,
-            image=conditioning_image,
-            negative_prompt=sample_config.negative_prompt if sample_config.cfg_scale > 1 else None,
-            true_cfg_scale=sample_config.cfg_scale,
-            height=height,
-            width=width,
-            num_inference_steps=sample_config.diffusion_steps,
-            generator=generator,
-            **pipeline_kwargs,
-        ).images[0]
+        with self.model.autocast_context:
+            output = self.pipeline(
+                prompt=sample_config.prompt,
+                image=conditioning_image,
+                negative_prompt=sample_config.negative_prompt if sample_config.cfg_scale > 1 else None,
+                true_cfg_scale=sample_config.cfg_scale,
+                height=height,
+                width=width,
+                num_inference_steps=sample_config.diffusion_steps,
+                generator=generator,
+                **pipeline_kwargs,
+            ).images[0]
         sampler_output = ModelSamplerOutput(file_type=FileType.IMAGE, data=output)
         self.save_sampler_output(sampler_output, destination, image_format, video_format, audio_format)
         on_sample(sampler_output)
