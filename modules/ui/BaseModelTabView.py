@@ -63,6 +63,7 @@ class BaseModelTabView(ABC):
             ("bfloat16", DataType.BFLOAT_16),
             ("float16", DataType.FLOAT_16),
             ("float8 (W8)", DataType.FLOAT_8),
+            ("int8 (W8)", DataType.INT_8),
             ("nfloat4", DataType.NFLOAT_4),
         ]
 

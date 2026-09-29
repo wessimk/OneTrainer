@@ -48,10 +48,20 @@ class QwenImage21LoRASetup(BaseQwenImage21Setup):
         init_model_parameters(model, params, self.train_device)
 
     def setup_train_device(self, model, config):
+        # bitsandbytes materializes INT8 weights during the first device move. The base weights must already be
+        # frozen at that point because PyTorch does not allow integer Parameters with requires_grad=True.
+        model.text_encoder.requires_grad_(False)
+        model.transformer.requires_grad_(False)
+        model.vae.requires_grad_(False)
+
         parts = ["transformer"]
         if not config.latent_caching:
             parts.extend(["text_encoder", "vae"])
-        model.materialize_only(*parts)
+            model.materialize_only(*parts)
+        else:
+            # The loader leaves the encoder and VAE on temp_device already. Avoid a redundant CPU-to-CPU move:
+            # bitsandbytes 0.49 treats that as the first materialization and attempts to quantize on CPU.
+            model.materialize(*parts)
         model.text_encoder.eval()
         model.vae.eval()
         model.transformer.train(config.transformer.train)

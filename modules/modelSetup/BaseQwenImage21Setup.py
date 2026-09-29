@@ -1,4 +1,5 @@
 from abc import ABCMeta
+from types import SimpleNamespace
 
 import modules.util.multi_gpu_util as multi
 from modules.model.QwenImage21Model import QwenImage21Model
@@ -46,6 +47,13 @@ class BaseQwenImage21Setup(
         )
         self._setup_model_part(model, config, "vae", config.vae)
         self._set_attention_backend(model.transformer, config.attention_mechanism, mask=True)
+
+        # With compilation enabled, OneTrainer replaces each block with a checkpoint wrapper. Diffusers checks
+        # block.attn.processor before executing the blocks, so expose the already-selected processor on that
+        # Qwen-specific wrapper without changing the shared checkpoint implementation.
+        for block in model.transformer.transformer_blocks:
+            if not hasattr(block, "attn") and getattr(block, "checkpoint", None) is not None:
+                block.__dict__["attn"] = SimpleNamespace(processor=block.checkpoint.attn.processor)
 
     def predict(
             self,

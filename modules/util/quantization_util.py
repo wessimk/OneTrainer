@@ -82,11 +82,22 @@ def __create_linear_layer(construct_fn, module: nn.Linear, copy_parameters: bool
     bias = module.bias is not None
 
     with accelerate.init_empty_weights():
-        quant_linear = construct_fn(
-            module.in_features,
-            module.out_features,
-            bias=bias,
-        )
+        try:
+            quant_linear = construct_fn(
+                in_features=module.in_features,
+                out_features=module.out_features,
+                bias=bias,
+            )
+        except TypeError as error:
+            if "unexpected keyword argument 'in_features'" not in str(error):
+                raise
+            # bitsandbytes 0.49 renamed these parameters to input_features/output_features and only accepts
+            # OneTrainer's dimensions portably as positional arguments.
+            quant_linear = construct_fn(
+                module.in_features,
+                module.out_features,
+                bias=bias,
+            )
 
     if copy_parameters:
         quant_linear.weight = type(quant_linear.weight)(module.weight, requires_grad=False)

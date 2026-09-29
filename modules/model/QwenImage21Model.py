@@ -20,6 +20,8 @@ from diffusers import (
 )
 from transformers import Qwen3VLForConditionalGeneration, Qwen3VLProcessor
 
+from bitsandbytes.nn import Linear8bitLt
+
 PROMPT_MAX_LENGTH = 2048
 SYSTEM_PROMPT = "Comprehend and analyze the provided prompt."
 
@@ -64,6 +66,30 @@ class QwenImage21Model(BaseModel):
         system_tokens = self.processor.apply_chat_template(system_message, tokenize=True, return_dict=False)
         self._drop_idx = len(system_tokens[0])
         self._img_token_id = self.processor.tokenizer.encode("<|image_pad|>")[0]
+
+    def _move_part(self, part: str, device: torch.device):
+        super()._move_part(part, device)
+
+        # torch.nn.Module.to() recursively applies tensors without invoking a child module's overridden to().
+        # Linear8bitLt keeps its quantization state outside parameters/buffers, so that state otherwise remains
+        # on CUDA after the parent text encoder is evicted and consumes several GiB of VRAM.
+        stem = f"{part}_1" if hasattr(self, f"{part}_1") else part
+        component = getattr(self, stem, None)
+        if component is None:
+            return
+        for module in component.modules():
+            if not isinstance(module, Linear8bitLt) or module.weight.is_meta:
+                continue
+            weight_device = module.weight.device
+            if module.weight.dtype == torch.int8:
+                if module.weight.CB is not None:
+                    module.weight.CB = module.weight.data
+                if module.state.CB is not None:
+                    module.state.CB = module.weight.data
+            if module.weight.SCB is not None:
+                module.weight.SCB = module.weight.SCB.to(weight_device)
+            if module.state.SCB is not None:
+                module.state.SCB = module.state.SCB.to(weight_device)
 
     def lora_text_encoders(self) -> list[tuple[torch.nn.Module | None, dict[ModelFormat, str]]]:
         return [

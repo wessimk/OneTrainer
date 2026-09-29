@@ -19,6 +19,8 @@ from mgds.pipelineModules.SampleVAEDistribution import SampleVAEDistribution
 from mgds.pipelineModules.SaveImage import SaveImage
 from mgds.pipelineModuleTypes.RandomAccessPipelineModule import RandomAccessPipelineModule
 
+import torch
+
 
 class EncodeQwenImage21Prompt(PipelineModule, RandomAccessPipelineModule):
     def __init__(self, model: QwenImage21Model):
@@ -47,6 +49,32 @@ class EncodeQwenImage21Prompt(PipelineModule, RandomAccessPipelineModule):
         }
 
 
+class AddQwenImage21Alpha(PipelineModule, RandomAccessPipelineModule):
+    """Convert OneTrainer's RGB image tensors to the RGBA input expected by the Qwen Image 2.1 VAE."""
+
+    def __init__(self, in_name: str, out_name: str):
+        super().__init__()
+        self.in_name = in_name
+        self.out_name = out_name
+
+    def length(self):
+        return self._get_previous_length(self.in_name)
+
+    def get_inputs(self):
+        return [self.in_name]
+
+    def get_outputs(self):
+        return [self.out_name]
+
+    def get_item(self, variation: int, index: int, requested_name: str = None):
+        image = self._get_previous_item(variation, self.in_name, index)
+        if image.shape[0] == 3:
+            image = torch.cat([image, torch.ones_like(image[:1])], dim=0)
+        elif image.shape[0] != 4:
+            raise ValueError(f"Qwen Image 2.1 VAE expects RGB or RGBA input, received {image.shape[0]} channels")
+        return {self.out_name: image}
+
+
 @factory.register(BaseDataLoader, ModelType.QWEN_IMAGE_21)
 class QwenImage21BaseDataLoader(BaseDataLoader, DataLoaderText2ImageMixin):
     def _preparation_modules(self, config: TrainConfig, model: QwenImage21Model):
@@ -61,6 +89,10 @@ class QwenImage21BaseDataLoader(BaseDataLoader, DataLoaderText2ImageMixin):
         rescale_condition = RescaleImageChannels(
             image_in_name="conditioning_image", image_out_name="conditioning_image",
             in_range_min=0, in_range_max=1, out_range_min=-1, out_range_max=1,
+        )
+        add_image_alpha = AddQwenImage21Alpha(in_name="image", out_name="image")
+        add_condition_alpha = AddQwenImage21Alpha(
+            in_name="conditioning_image", out_name="conditioning_image",
         )
         condition_to_video = ImageToVideo(in_name="conditioning_image", out_name="conditioning_image")
         encode_image = EncodeVAE(
@@ -79,7 +111,7 @@ class QwenImage21BaseDataLoader(BaseDataLoader, DataLoaderText2ImageMixin):
         )
         return [
             encode_prompt,
-            rescale_image, rescale_condition, condition_to_video,
+            rescale_image, rescale_condition, add_image_alpha, add_condition_alpha, condition_to_video,
             encode_image, encode_condition, sample_image, sample_condition,
         ]
 
