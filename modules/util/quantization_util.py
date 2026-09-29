@@ -83,8 +83,8 @@ def __create_linear_layer(construct_fn, module: nn.Linear, copy_parameters: bool
 
     with accelerate.init_empty_weights():
         quant_linear = construct_fn(
-            in_features=module.in_features,
-            out_features=module.out_features,
+            module.in_features,
+            module.out_features,
             bias=bias,
         )
 
@@ -226,8 +226,12 @@ def replace_linear_with_quantized_layers(
     #ensure that all Linear layers were replaced
     #https://github.com/Nerogar/OneTrainer/issues/1050
     for name, module in parent_module.named_modules():
+        is_bnb_quantized_linear = bnb is not None and isinstance(
+            module, (bnb.nn.Linear8bitLt, bnb.nn.Linear4bit),
+        )
         assert (not isinstance(module, convert_type)
                 or isinstance(module, (QuantizedLinearMixin, LinearGGUFA8))
+                or is_bnb_quantized_linear
                 or any(s in name.split('.') for s in keep_in_fp32_modules)
                 or (quant_filters is not None and len(quant_filters) > 0 and not any(f.matches(name) for f in quant_filters))
                ), f"Linear layer {name} was not found in model for quantization"
