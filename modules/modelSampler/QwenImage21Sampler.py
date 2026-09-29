@@ -6,6 +6,7 @@ from modules.modelSampler.BaseModelSampler import BaseModelSampler, ModelSampler
 from modules.util import factory
 from modules.util.config.SampleConfig import SampleConfig
 from modules.util.enum.FileType import FileType
+from modules.util.enum.ImageFormat import ImageFormat
 from modules.util.enum.ModelType import ModelType
 from modules.util.image_util import load_image
 
@@ -62,6 +63,10 @@ class QwenImage21Sampler(BaseModelSampler):
                 generator=generator,
                 **pipeline_kwargs,
             ).images[0]
+        if image_format == ImageFormat.JPG and output.mode == "RGBA":
+            background = Image.new("RGB", output.size, "white")
+            background.paste(output, mask=output.getchannel("A"))
+            output = background
         sampler_output = ModelSamplerOutput(file_type=FileType.IMAGE, data=output)
         self.save_sampler_output(sampler_output, destination, image_format, video_format, audio_format)
         on_sample(sampler_output)
