@@ -24,6 +24,7 @@ class ModelTabController:
             or model_type.is_ernie()
             or model_type.is_chroma()
             or model_type.is_qwen()
+            or model_type.is_qwen_image_21()
             or model_type.is_anima()
             or model_type.is_hunyuan_video()
         )

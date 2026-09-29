@@ -1,0 +1,28 @@
+{
+    "workspace_dir": "workspace/qwen-image-21-minimal-edit",
+    "cache_dir": "workspace-cache/qwen-image-21-minimal-edit",
+    "output_model_destination": "models/qwen-image-21-minimal-edit.safetensors",
+    "epochs": 1,
+    "tensorboard": false,
+    "dataloader_threads": 1,
+    "concepts": [
+        {
+            "name": "minimal_edit_dataset",
+            "path": "minimal-edit-dataset",
+            "enabled": true,
+            "type": "STANDARD",
+            "include_subdirectories": false,
+            "image_variations": 1,
+            "text_variations": 1,
+            "balancing": 1.0,
+            "balancing_strategy": "REPEATS",
+            "loss_weight": 1.0,
+            "image": {
+                "enable_crop_jitter": false
+            },
+            "text": {
+                "prompt_source": "sample"
+            }
+        }
+    ]
+}

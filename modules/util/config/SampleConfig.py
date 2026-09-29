@@ -86,6 +86,13 @@ def _get_model_defaults(model_type) -> dict:
             "diffusion_steps": 25,
             "cfg_scale": 3.5,
         })
+    elif model_type.is_qwen_image_21():
+        defaults.update({
+            "width": 1024,
+            "height": 1024,
+            "diffusion_steps": 40,
+            "cfg_scale": 1.0,
+        })
     elif model_type.is_anima():
         defaults.update({
             "width": 1024,

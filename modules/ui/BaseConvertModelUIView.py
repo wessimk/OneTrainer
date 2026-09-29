@@ -33,6 +33,7 @@ class BaseConvertModelUIView:
             ("Hunyuan Video", ModelType.HUNYUAN_VIDEO),
             ("Chroma1", ModelType.CHROMA_1), #TODO does this just work? HiDream is not here
             ("QwenImage", ModelType.QWEN), #TODO does this just work? HiDream is not here
+            ("Qwen Image 2.1", ModelType.QWEN_IMAGE_21),
             ("Anima", ModelType.ANIMA),
             ("Krea 2", ModelType.KREA_2),
             ("ZImage", ModelType.Z_IMAGE),

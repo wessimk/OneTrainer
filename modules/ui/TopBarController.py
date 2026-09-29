@@ -39,6 +39,7 @@ class TopBarController:
             ("HiDream Full", ModelType.HI_DREAM_FULL),
             ("Chroma1", ModelType.CHROMA_1),
             ("QwenImage", ModelType.QWEN),
+            ("Qwen Image 2.1", ModelType.QWEN_IMAGE_21),
             ("Anima", ModelType.ANIMA),
             ("Krea 2", ModelType.KREA_2),
             ("Z-Image", ModelType.Z_IMAGE),

@@ -39,6 +39,7 @@ class ModelType(Enum):
     CHROMA_1 = 'CHROMA_1'
 
     QWEN = 'QWEN'
+    QWEN_IMAGE_21 = 'QWEN_IMAGE_21'
 
     ANIMA = 'ANIMA'
     KREA_2 = 'KREA_2'
@@ -105,6 +106,9 @@ class ModelType(Enum):
     def is_qwen(self):
         return self == ModelType.QWEN
 
+    def is_qwen_image_21(self):
+        return self == ModelType.QWEN_IMAGE_21
+
     def is_anima(self):
         return self == ModelType.ANIMA
 
@@ -144,7 +148,8 @@ class ModelType(Enum):
         return self == ModelType.STABLE_DIFFUSION_15_INPAINTING \
             or self == ModelType.STABLE_DIFFUSION_20_INPAINTING \
             or self == ModelType.STABLE_DIFFUSION_XL_10_BASE_INPAINTING \
-            or self == ModelType.FLUX_FILL_DEV_1
+            or self == ModelType.FLUX_FILL_DEV_1 \
+            or self == ModelType.QWEN_IMAGE_21
 
     def has_depth_input(self):
         return self == ModelType.STABLE_DIFFUSION_20_DEPTH
@@ -175,6 +180,7 @@ class ModelType(Enum):
             or self.is_flux() \
             or self.is_chroma() \
             or self.is_qwen() \
+            or self.is_qwen_image_21() \
             or self.is_anima() \
             or self.is_krea2() \
             or self.is_sana() \
@@ -206,7 +212,7 @@ class ModelType(Enum):
                 or self.is_hi_dream() \
                 or self.is_chroma():
             return (TrainingMethod.FINE_TUNE, TrainingMethod.LORA, TrainingMethod.EMBEDDING)
-        if self.is_qwen() or self.is_z_image() or self.is_flux_2() or self.is_ernie() \
+        if self.is_qwen() or self.is_qwen_image_21() or self.is_z_image() or self.is_flux_2() or self.is_ernie() \
                 or self.is_anima() or self.is_krea2() or self.is_ideogram():
             return (TrainingMethod.FINE_TUNE, TrainingMethod.LORA)
         raise ValueError(f"No supported training methods defined for model type {self}")
@@ -235,6 +241,7 @@ class ModelType(Enum):
             or self.is_flux_2() \
             or self.is_chroma() \
             or self.is_qwen() \
+            or self.is_qwen_image_21() \
             or self.is_hunyuan_video() \
             or self.is_z_image() \
             or self.is_ernie()
@@ -247,7 +254,7 @@ class ModelType(Enum):
         if self.is_stable_diffusion() or self.is_stable_diffusion_xl() or self.is_stable_diffusion_3():
             formats.append(ModelFormat.ORIGINAL_SINGLE_FILE)
         elif (self.is_flux_1() or self.is_flux_2() or self.is_chroma() or self.is_hunyuan_video()
-                or self.is_hi_dream() or self.is_pixart() or self.is_qwen() or self.is_ernie()
+                or self.is_hi_dream() or self.is_pixart() or self.is_qwen() or self.is_qwen_image_21() or self.is_ernie()
                 or self.is_z_image() or self.is_anima() or self.is_krea2() or self.is_ideogram()):
             formats.append(ModelFormat.ORIGINAL_TRANSFORMER)
         if self.is_z_image():
@@ -261,6 +268,7 @@ class ModelType(Enum):
             or self.is_flux_2() \
             or self.is_chroma() \
             or self.is_qwen() \
+            or self.is_qwen_image_21() \
             or self.is_hunyuan_video() \
             or self.is_hi_dream() \
             or self.is_z_image() \
@@ -310,6 +318,7 @@ _MODEL_PARTS: dict[ModelType, tuple[str, ...]] = {
     ModelType.HI_DREAM_FULL: ("transformer", "text_encoder", "text_encoder_2", "text_encoder_3", "text_encoder_4", "vae"),
     ModelType.CHROMA_1: ("transformer", "text_encoder", "vae"),
     ModelType.QWEN: ("transformer", "text_encoder", "vae"),
+    ModelType.QWEN_IMAGE_21: ("transformer", "text_encoder", "vae"),
     ModelType.KREA_2: ("transformer", "text_encoder", "vae"),
     ModelType.Z_IMAGE: ("transformer", "text_encoder", "vae"),
     ModelType.ERNIE: ("transformer", "text_encoder", "vae"),

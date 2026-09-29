@@ -1,0 +1,34 @@
+{
+    "base_model_name": "Qwen/Qwen-Image-2.1",
+    "batch_size": 1,
+    "learning_rate": 0.0002,
+    "model_type": "QWEN_IMAGE_21",
+    "output_model_format": "DIFFUSERS_LORA",
+    "resolution": "512",
+    "compile": true,
+    "custom_conditioning_image": true,
+    "dynamic_timestep_shifting": true,
+    "transformer": {
+        "train": true,
+        "weight_dtype": "INT_8",
+        "offload_fraction": 0.5
+    },
+    "text_encoder": {
+        "train": false,
+        "weight_dtype": "INT_8"
+    },
+    "training_method": "LORA",
+    "vae": {
+        "weight_dtype": "FLOAT_32"
+    },
+    "train_dtype": "BFLOAT_16",
+    "weight_dtype": "BFLOAT_16",
+    "output_dtype": "BFLOAT_16",
+    "timestep_distribution": "UNIFORM",
+    "layer_filter": "attn,img_mlp",
+    "layer_filter_preset": "attn-mlp",
+    "quantization": {
+        "layer_filter": "transformer_blocks",
+        "layer_filter_preset": "blocks"
+    }
+}
