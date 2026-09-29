@@ -8,6 +8,7 @@ class BaseSampleFrameView:
     def build_content(self, top_frame, bottom_frame, ui_state, controller, include_prompt, include_settings):
         is_flow_matching = controller.is_flow_matching()
         is_inpainting_model = controller.is_inpainting_model()
+        supports_conditioning_image = controller.supports_conditioning_image()
         is_video_model = controller.is_video_model()
         if include_prompt:
             # prompt
@@ -94,3 +95,16 @@ class BaseSampleFrameView:
                                            allow_model_files=False,
                                            allow_image_files=True,
                                            )
+
+            if supports_conditioning_image:
+                conditioning_row = 7 if is_inpainting_model else 5
+                self.components.label(
+                    bottom_frame, conditioning_row, 0, "conditioning image path:",
+                    tooltip="Input image used to condition image-edit inference.",
+                )
+                self.components.path_entry(
+                    bottom_frame, conditioning_row, 1, ui_state, "conditioning_image_path",
+                    mode="file",
+                    allow_model_files=False,
+                    allow_image_files=True,
+                )

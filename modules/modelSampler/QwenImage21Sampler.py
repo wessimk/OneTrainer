@@ -6,6 +6,7 @@ from modules.util import factory
 from modules.util.config.SampleConfig import SampleConfig
 from modules.util.enum.FileType import FileType
 from modules.util.enum.ModelType import ModelType
+from modules.util.image_util import load_image
 
 import torch
 
@@ -31,8 +32,16 @@ class QwenImage21Sampler(BaseModelSampler):
         self.model.materialize_only("text_encoder", "transformer", "vae")
         generator = torch.Generator(device=self.train_device)
         generator.seed() if sample_config.random_seed else generator.manual_seed(sample_config.seed)
+        conditioning_image = None
+        if sample_config.conditioning_image_path:
+            if not self.model.train_config.custom_conditioning_image:
+                raise ValueError(
+                    "Qwen Image 2.1 conditioning-image sampling requires custom_conditioning_image to be enabled"
+                )
+            conditioning_image = load_image(sample_config.conditioning_image_path, convert_mode="RGB")
         output = self.pipeline(
             prompt=sample_config.prompt,
+            image=conditioning_image,
             negative_prompt=sample_config.negative_prompt if sample_config.cfg_scale > 1 else None,
             true_cfg_scale=sample_config.cfg_scale,
             height=self.quantize_resolution(sample_config.height, 32),

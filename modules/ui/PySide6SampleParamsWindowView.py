@@ -19,7 +19,13 @@ class PySide6SampleParamsWindowView(BaseSampleParamsWindowView, QDialog):
         outer.setRowStretch(0, 1)
         outer.setColumnStretch(0, 1)
 
-        frame = PySide6SampleFrameView(self, SampleFrameController(controller.sample, controller.model_type), ui_state)
+        frame = PySide6SampleFrameView(
+            self,
+            SampleFrameController(
+                controller.sample, controller.model_type, controller.custom_conditioning_image,
+            ),
+            ui_state,
+        )
         outer.addWidget(frame, 0, 0)
 
         ok = QPushButton("ok", self)

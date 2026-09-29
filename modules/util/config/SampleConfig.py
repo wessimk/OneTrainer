@@ -190,6 +190,7 @@ class SampleConfig(BaseConfig):
     sample_inpainting: bool
     base_image_path: str
     mask_image_path: str
+    conditioning_image_path: str
 
     def __init__(self, data: list[(str, Any, type, bool)]):
         super().__init__(data)
@@ -234,5 +235,6 @@ class SampleConfig(BaseConfig):
         data.append(("sample_inpainting", False, bool, False))
         data.append(("base_image_path", "", str, False))
         data.append(("mask_image_path", "", str, False))
+        data.append(("conditioning_image_path", "", str, False))
 
         return SampleConfig(data)

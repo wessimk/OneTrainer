@@ -36,7 +36,9 @@ class PySide6SampleWindowView(BaseSampleWindowView, QDialog):
         outer.setColumnStretch(1, 1)
 
         model_type = controller.get_model_type()
-        frame_controller = SampleFrameController(controller.sample, model_type)
+        frame_controller = SampleFrameController(
+            controller.sample, model_type, controller.current_train_config.custom_conditioning_image,
+        )
 
         prompt_frame = PySide6SampleFrameView(self, frame_controller, self.ui_state, include_settings=False)
         outer.addWidget(prompt_frame, 0, 0, 1, 2)

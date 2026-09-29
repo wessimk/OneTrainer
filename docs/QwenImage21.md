@@ -22,3 +22,7 @@ From the repository root, the included minimal smoke configuration can be run wi
 The preset enables paired conditioning images, INT8 weights for the transformer and Qwen3-VL encoder, compilation,
 dynamic timestep shifting using the checkpoint scheduler parameters, and the Qwen Image 2.1 transformer layer names.
 Text-encoder training is not currently supported; the text/vision conditioning is cached before transformer training.
+
+When `custom_conditioning_image` is enabled, the sample editor shows a dedicated **conditioning image path** field.
+Qwen Image 2.1 passes that image to the Diffusers edit pipeline as both vision context and VAE conditioning. The
+**base image** and **mask image** fields are reserved for masked inpainting models and are not used by Qwen Image 2.1.
