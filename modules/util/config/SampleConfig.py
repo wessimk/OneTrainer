@@ -191,6 +191,7 @@ class SampleConfig(BaseConfig):
     base_image_path: str
     mask_image_path: str
     conditioning_image_path: str
+    resize_conditioning_image: bool
 
     def __init__(self, data: list[(str, Any, type, bool)]):
         super().__init__(data)
@@ -236,5 +237,6 @@ class SampleConfig(BaseConfig):
         data.append(("base_image_path", "", str, False))
         data.append(("mask_image_path", "", str, False))
         data.append(("conditioning_image_path", "", str, False))
+        data.append(("resize_conditioning_image", False, bool, False))
 
         return SampleConfig(data)

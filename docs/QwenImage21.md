@@ -26,3 +26,5 @@ Text-encoder training is not currently supported; the text/vision conditioning i
 When `custom_conditioning_image` is enabled, the sample editor shows a dedicated **conditioning image path** field.
 Qwen Image 2.1 passes that image to the Diffusers edit pipeline as both vision context and VAE conditioning. The
 **base image** and **mask image** fields are reserved for masked inpainting models and are not used by Qwen Image 2.1.
+Enable the adjacent **resize** switch to resize the conditioning image to the sample's output width and height before
+the text encoder and VAE process it.

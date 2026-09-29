@@ -108,3 +108,10 @@ class BaseSampleFrameView:
                     allow_model_files=False,
                     allow_image_files=True,
                 )
+                self.components.label(
+                    bottom_frame, conditioning_row, 2, "resize:",
+                    tooltip="Resize the conditioning image to the output width and height before encoding.",
+                )
+                self.components.switch(
+                    bottom_frame, conditioning_row, 3, ui_state, "resize_conditioning_image",
+                )
