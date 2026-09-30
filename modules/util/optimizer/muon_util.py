@@ -40,6 +40,10 @@ def build_muon_adam_key_fn(
                     'transformer_blocks',
                     'encoder.block', # TE (T5)
                 ]
+            case ModelType.QWEN_IMAGE_21:
+                default_patterns = [
+                    'transformer_blocks',
+                ]
             case ModelType.HI_DREAM_FULL:
                 default_patterns = [
                     'caption_projection',
